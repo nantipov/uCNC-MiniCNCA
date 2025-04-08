@@ -2,6 +2,11 @@
 <img src="https://github.com/Paciente8159/uCNC/blob/master/docs/logo.png?raw=true">
 </p>
 
+# µCNC - MiniCNC-A
+
+Adoptaion
+
+
 # µCNC
 
 µCNC - Universal CNC firmware for microcontrollers
