@@ -25,9 +25,6 @@ extern "C"
 #define ITP_TIMER 1
 #define RTC_TIMER 2
 
-#define ENABLE_WIFI
-#define ENABLE_BLUETOOTH
-
 // dir, step, en
 // x - 2, 3, 4
 // y - 6, 7, 8
