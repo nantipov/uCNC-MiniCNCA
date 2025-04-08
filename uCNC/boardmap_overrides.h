@@ -13,8 +13,7 @@ extern "C"
 #define MCU MCU_RP2040
 #define KINEMATIC KINEMATIC_CARTESIAN
 #define AXIS_COUNT 3
-// //#define TOOL_COUNT 1
-// //#define TOOL_COUNT 2
+#define TOOL_COUNT 2
 #define BAUDRATE 115200
 #define BOARD BOARD_RPI_PICO
 #define BOARD_NAME "MiniCNCA"
@@ -79,8 +78,6 @@ extern "C"
 // //#define IC74HC595_DELAY_CYCLES 0
 // //Custom configurations
 
-
-// //#define ENABLE_DEBUG_STREAM
 
 
 #ifdef __cplusplus

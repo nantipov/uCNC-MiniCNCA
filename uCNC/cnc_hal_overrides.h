@@ -15,6 +15,7 @@ extern "C"
 #define DISABLE_ALL_LIMITS
 #define DISABLE_PROBE
 #define TOOL1 spindle_pwm
+#define TOOL2 pen_revolver
 #define SPINDLE_PWM PWM0
 #define SPINDLE_PWM_DIR DOUT0
 #define ENCODERS 0
@@ -23,6 +24,9 @@ extern "C"
 #define DEFAULT_STEP_INV_MASK 255 // invert EN-pin for TMC2208
 #define DEFAULT_STEP_PER_MM 1600
 #define DEFAULT_MAX_FEED 5000
+
+// #define ENABLE_DEBUG_STREAM
+
 //Custom configurations
 
 #ifdef __cplusplus
