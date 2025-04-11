@@ -18,19 +18,19 @@
 #endif
 
 #ifndef PEN_TOGGLE_SERVO_HIGH_POS
-#define PEN_TOGGLE_SERVO_HIGH_POS 50
+#define PEN_TOGGLE_SERVO_HIGH_POS 600
 #endif
 
 #ifndef PEN_TOGGLE_SERVO_LOW_POS
-#define PEN_TOGGLE_SERVO_LOW_POS 2500
+#define PEN_TOGGLE_SERVO_LOW_POS 150
 #endif
 
 uint16_t pen_changing_servo_positions[5] = {
-    50UL,
+    200UL,
+    300UL,
+    400UL,
     500UL,
-    2000UL,
-    2500UL,
-    3500UL
+    600UL
 }; // 0 .. 4096
 
 uint16_t current_pos_revolver = 50UL;
@@ -58,15 +58,15 @@ static void gradual_move(uint8_t servo_num, uint16_t from_val, uint16_t to_val) 
     uint16_t delta = abs(to_val - from_val);
     uint16_t speed = 1;
     if (delta > 1000) {
-        speed = 100;
+        speed = 500;
     } else if (delta > 500) {
-        speed = 50;
+        speed = 100;
     } else if (delta > 100) {
-        speed = 10;
+        speed = 50;
     } else if (delta > 50) {
-        speed = 5;
+        speed = 10;
     } else if (delta > 10) {
-        speed = 2;
+        speed = 5;
     }
 
     int8_t inc = 1;
