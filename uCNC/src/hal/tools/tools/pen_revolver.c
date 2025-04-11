@@ -4,8 +4,8 @@
 
 /**
  * Pen revoler
- * speed == 0 => toggle
- * positive speed = expect number of a pen
+ * speed == 0 => toggle (up / down / up)
+ * positive speed = switch pen to absolute value (e.g. speed 1 = 1st pen)
  *
  * */
 
@@ -55,6 +55,10 @@ static int16_t range_speed(int16_t value, uint8_t conv)
 }
 
 static void gradual_move(uint8_t servo_num, uint16_t from_val, uint16_t to_val) {
+    if (to_val == from_val) {
+        return;
+    }
+
     uint16_t delta = abs(to_val - from_val);
     uint16_t speed = 1;
     if (delta > 1000) {
@@ -78,11 +82,11 @@ static void gradual_move(uint8_t servo_num, uint16_t from_val, uint16_t to_val) 
 
     for (uint16_t i = 0; i < delta; i = i + speed) {
         pca9685_setPWM(servo_num, 0, from_val + i * inc);
-        cnc_delay_ms(100);
+        cnc_delay_ms(50);
     }
 
     pca9685_setPWM(servo_num, 0, to_val);
-    cnc_delay_ms(100);
+    cnc_delay_ms(50);
 }
 
 static void change_pen(int16_t pen_number) {
@@ -104,15 +108,15 @@ static void toggle_pen() {
 
     // up
     gradual_move(PEN_TOGGLE_SERVO_NUM, PEN_TOGGLE_SERVO_LOW_POS, PEN_TOGGLE_SERVO_HIGH_POS);
-    cnc_delay_ms(1000);
+    cnc_delay_ms(500);
 
     // down
     gradual_move(PEN_TOGGLE_SERVO_NUM, PEN_TOGGLE_SERVO_HIGH_POS, PEN_TOGGLE_SERVO_LOW_POS);
-    cnc_delay_ms(1000);
+    cnc_delay_ms(500);
 
     // up
     gradual_move(PEN_TOGGLE_SERVO_NUM, PEN_TOGGLE_SERVO_LOW_POS, PEN_TOGGLE_SERVO_HIGH_POS);
-    cnc_delay_ms(1000);
+    cnc_delay_ms(500);
 }
 
 static void set_speed(int16_t value)
