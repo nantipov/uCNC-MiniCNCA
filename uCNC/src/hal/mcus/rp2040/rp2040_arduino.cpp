@@ -1447,7 +1447,7 @@ extern "C"
 		I2C_REG.beginTransmission(address);
 		I2C_REG.write(data, datalen);
 		uint8_t r = I2C_REG.endTransmission(release);
-		DBGMSG(">>> mcu_i2c_send(), result=%d, addr=%d, datalen=%d", r, address, datalen);
+		// DBGMSG(">>> mcu_i2c_send(), result=%d, addr=%d, datalen=%d", r, address, datalen);
 		return r == 0 ? I2C_OK : I2C_NOTOK;
 	}
 
