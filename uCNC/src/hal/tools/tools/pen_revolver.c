@@ -33,6 +33,8 @@ uint16_t pen_changing_servo_positions[5] = {
     3500UL
 }; // 0 .. 4096
 
+uint16_t current_pos_revolver = 50UL;
+
 static void startup_code(void)
 {
     DBGMSG("pen_revolver startup_code()");
@@ -52,6 +54,22 @@ static int16_t range_speed(int16_t value, uint8_t conv)
 	return value;
 }
 
+static void gradual_move(uint8_t servo_num, uint16_t from_val, uint16_t to_val) {
+    int8_t inc = 1;
+    if (to_val < from_val) {
+        inc = -1;
+    }
+
+    uint8_t delta = abs(to_val - from_val);
+
+    DBGMSG("pen_revolver gradual_move(%d, %d, %d), inc=%d, delta=%d", servo_num, from_val, to_val, inc, delta);
+
+    for (uint16_t i = 0; i < delta; i++) {
+        pca9685_setPWM(servo_num, 0, from_val + i * inc);
+        cnc_delay_ms(10);
+    }
+}
+
 static void change_pen(int16_t pen_number) {
     DBGMSG("pen_revolver change_pen(%d)", pen_number);
     if (pen_number < 1 || pen_number > 5) {
@@ -60,18 +78,23 @@ static void change_pen(int16_t pen_number) {
     // turn servo #1 via PCA9685 
     uint16_t pos = pen_changing_servo_positions[pen_number - 1];
     DBGMSG("pen_revolver change_pen(), pos=%d", pos);
-    pca9685_setPWM(PEN_CHANGING_SERVO_NUM, 0, pos);
+    // pca9685_setPWM(PEN_CHANGING_SERVO_NUM, 0, pos);
+    gradual_move(PEN_CHANGING_SERVO_NUM, current_pos_revolver, pos);
+    current_pos_revolver = pos;
     cnc_delay_ms(1000);
 }
 
 static void toggle_pen() {
     DBGMSG("pen_revolver toggle_pen()");
     // turn servo #2 via PCA9685
-    pca9685_setPWM(PEN_TOGGLE_SERVO_NUM, 0, PEN_TOGGLE_SERVO_HIGH_POS);
+    gradual_move(PEN_CHANGING_SERVO_NUM, PEN_TOGGLE_SERVO_LOW_POS, PEN_TOGGLE_SERVO_HIGH_POS);
+    // pca9685_setPWM(PEN_TOGGLE_SERVO_NUM, 0, PEN_TOGGLE_SERVO_HIGH_POS);
     cnc_delay_ms(1000);
-    pca9685_setPWM(PEN_TOGGLE_SERVO_NUM, 0, PEN_TOGGLE_SERVO_LOW_POS);
+    gradual_move(PEN_CHANGING_SERVO_NUM, PEN_TOGGLE_SERVO_HIGH_POS, PEN_TOGGLE_SERVO_LOW_POS);
+    // pca9685_setPWM(PEN_TOGGLE_SERVO_NUM, 0, PEN_TOGGLE_SERVO_LOW_POS);
     cnc_delay_ms(1000);
-    pca9685_setPWM(PEN_TOGGLE_SERVO_NUM, 0, PEN_TOGGLE_SERVO_HIGH_POS);
+    gradual_move(PEN_CHANGING_SERVO_NUM, PEN_TOGGLE_SERVO_LOW_POS, PEN_TOGGLE_SERVO_HIGH_POS);
+    // pca9685_setPWM(PEN_TOGGLE_SERVO_NUM, 0, PEN_TOGGLE_SERVO_HIGH_POS);
     cnc_delay_ms(1000);
 }
 

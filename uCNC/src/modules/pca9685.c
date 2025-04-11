@@ -8,7 +8,7 @@ bool write_buf(uint8_t* buf, uint8_t data_len) {
   DBGMSG("pca9685 write_buf(), size=%d", data_len);
 
 #ifdef MCU_HAS_I2C
-    return mcu_i2c_send(PCA9685_I2C_ADDRESS, buf, data_len, false, 1000);
+    return mcu_i2c_send(PCA9685_I2C_ADDRESS, buf, data_len, true, 0);
 #else
     //return softi2c_send(null, PCA9685_I2C_ADDRESS, buf, data_len, false, 1000);
     return false;
@@ -21,7 +21,7 @@ uint8_t read8(uint8_t addr) {
   uint8_t buffer_read[] = {0};
   write_buf(buffer_write, 1);
 #ifdef MCU_HAS_I2C
-  mcu_i2c_receive(PCA9685_I2C_ADDRESS, buffer_read, 1, 1000);
+  mcu_i2c_receive(PCA9685_I2C_ADDRESS, buffer_read, 1, 0);
 #else
   softi2c_receive(null, PCA9685_I2C_ADDRESS, buffer_read, 2, false, 1000);
 #endif
@@ -70,6 +70,13 @@ void pca9685_setExtClk(uint8_t prescale) {
   write8(PCA9685_MODE1, (newmode & ~MODE1_SLEEP) | MODE1_RESTART | MODE1_AI);
 }
 
+void pca9685_wakeup() {
+  DBGMSG("pca9685 pca9685_wakeup()");
+  uint8_t sleep = read8(PCA9685_MODE1);
+  uint8_t wakeup = sleep & ~MODE1_SLEEP; // set sleep bit low
+  write8(PCA9685_MODE1, wakeup);
+}
+
 void pca9685_setPWMFreq(float freq) {
   // Range output modulation frequency is dependant on oscillator
   if (freq < 1)
@@ -91,15 +98,19 @@ void pca9685_setPWMFreq(float freq) {
 
   DBGMSG("pca9685 pca9685_setPWMFreq(), oldmode=%d, newmode=%d", oldmode, newmode);
 
-  write8(PCA9685_MODE1, newmode);                             // go to sleep
+  write8(PCA9685_MODE1, newmode);     // go to sleep
   write8(PCA9685_PRESCALE, prescale); // set the prescaler
+
+  // write8(PCA9685_MODE1, newmode);     // go to sleep
+  // write8(PCA9685_PRESCALE, prescale); // set the prescaler
+
   write8(PCA9685_MODE1, oldmode);
   cnc_delay_ms(5);
   // This sets the MODE1 register to turn on auto increment.
   write8(PCA9685_MODE1, oldmode | MODE1_RESTART | MODE1_AI);
 
-  DBGMSG("pca9685 pca9685_setPWMFreq(), mode now=%d", read8(PCA9685_MODE1));
-  DBGMSG("pca9685 pca9685_setPWMFreq(), prescale now=%d", read8(PCA9685_PRESCALE));
+  // DBGMSG("pca9685 pca9685_setPWMFreq(), mode now=%d", read8(PCA9685_MODE1));
+  // DBGMSG("pca9685 pca9685_setPWMFreq(), prescale now=%d", read8(PCA9685_PRESCALE));
 }
 
 bool pca9685_begin(uint8_t prescale) {
