@@ -26,18 +26,19 @@
 #endif
 
 uint16_t pen_changing_servo_positions[5] = {
-    50,
-    1200,
-    2000,
-    2500,
-    3500
+    50UL,
+    500UL,
+    2000UL,
+    2500UL,
+    3500UL
 }; // 0 .. 4096
 
 static void startup_code(void)
 {
     DBGMSG("pen_revolver startup_code()");
     pca9685_begin(0);
-    pca9685_setPWMFreq(50.0f); //50 MHz
+    pca9685_setPWMFreq(50.0f); //50 Hz
+    cnc_delay_ms(10);
 }
 
 static void shutdown_code(void)
@@ -57,19 +58,21 @@ static void change_pen(int16_t pen_number) {
         return;
     }
     // turn servo #1 via PCA9685 
-    pca9685_setPWM(PEN_CHANGING_SERVO_NUM, 0, pen_changing_servo_positions[pen_number]);
-    mcu_delay_us(1000 * 1000);
+    uint16_t pos = pen_changing_servo_positions[pen_number - 1];
+    DBGMSG("pen_revolver change_pen(), pos=%d", pos);
+    pca9685_setPWM(PEN_CHANGING_SERVO_NUM, 0, pos);
+    cnc_delay_ms(1000);
 }
 
 static void toggle_pen() {
     DBGMSG("pen_revolver toggle_pen()");
     // turn servo #2 via PCA9685
     pca9685_setPWM(PEN_TOGGLE_SERVO_NUM, 0, PEN_TOGGLE_SERVO_HIGH_POS);
-    mcu_delay_us(1000 * 1000);
+    cnc_delay_ms(1000);
     pca9685_setPWM(PEN_TOGGLE_SERVO_NUM, 0, PEN_TOGGLE_SERVO_LOW_POS);
-    mcu_delay_us(1000 * 1000);
+    cnc_delay_ms(1000);
     pca9685_setPWM(PEN_TOGGLE_SERVO_NUM, 0, PEN_TOGGLE_SERVO_HIGH_POS);
-    mcu_delay_us(1000 * 1000);
+    cnc_delay_ms(1000);
 }
 
 static void set_speed(int16_t value)

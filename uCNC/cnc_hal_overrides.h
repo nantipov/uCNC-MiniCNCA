@@ -25,7 +25,7 @@ extern "C"
 #define DEFAULT_STEP_PER_MM 1600
 #define DEFAULT_MAX_FEED 5000
 
-// #define ENABLE_DEBUG_STREAM
+#define ENABLE_DEBUG_STREAM
 
 //Custom configurations
 
