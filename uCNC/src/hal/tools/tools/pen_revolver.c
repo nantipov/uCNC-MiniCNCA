@@ -81,11 +81,7 @@ static void gradual_move(uint8_t servo_num, uint16_t from_val, uint16_t to_val) 
     DBGMSG("pen_revolver gradual_move(%d, %d, %d), inc=%d, delta=%d, speed=%d", servo_num, from_val, to_val, inc, delta, speed);
 
     for (uint16_t i = 0; i < delta; i = i + speed) {
-        if (i <  delta) {
-            pca9685_setPWM(servo_num, 0, from_val + i * inc);
-        } else {
-            pca9685_setPWM(servo_num, 0, to_val);
-        }
+        pca9685_setPWM(servo_num, 0, from_val + i * inc);
         cnc_delay_ms(50);
     }
 
