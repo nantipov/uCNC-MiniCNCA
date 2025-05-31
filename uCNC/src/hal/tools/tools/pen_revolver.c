@@ -18,20 +18,28 @@
 #endif
 
 #ifndef PEN_TOGGLE_SERVO_HIGH_POS
-#define PEN_TOGGLE_SERVO_HIGH_POS 450
+#define PEN_TOGGLE_SERVO_HIGH_POS 470
 #endif
 
 #ifndef PEN_TOGGLE_SERVO_LOW_POS
-#define PEN_TOGGLE_SERVO_LOW_POS 68
+#define PEN_TOGGLE_SERVO_LOW_POS 87
 #endif
 
 uint16_t pen_changing_servo_positions[5] = {
-    200UL,
-    300UL,
-    400UL,
-    500UL,
-    600UL
+    72UL,
+    154UL,
+    242UL,
+    334UL,
+    424UL
 }; // 0 .. 4096
+
+// uint16_t pen_changing_servo_positions[5] = {
+//     108UL,
+//     190UL,
+//     278UL,
+//     370UL,
+//     460UL
+// }; // 0 .. 4096
 
 uint16_t current_pos_revolver = 50UL;
 
@@ -60,24 +68,24 @@ static void gradual_move(uint8_t servo_num, uint16_t from_val, uint16_t to_val) 
     }
 
     uint16_t delta = abs(to_val - from_val);
-    uint16_t speed = 1;
-    uint32_t delay = 5;
-    if (delta > 1000) {
-        speed = 500;
-        delay = 50;
-    } else if (delta > 500) {
-        speed = 100;
-        delay = 30;
-    } else if (delta > 100) {
-        speed = 50;
-        delay = 20;
-    } else if (delta > 50) {
-        speed = 10;
-        delay = 20;
-    } else if (delta > 10) {
-        speed = 5;
-        delay = 10;
-    }
+    uint16_t speed = 10;
+    uint32_t delay = 20;
+    // if (delta > 1000) {
+    //     speed = 500;
+    //     delay = 50;
+    // } else if (delta > 500) {
+    //     speed = 100;
+    //     delay = 30;
+    // } else if (delta > 100) {
+    //     speed = 50;
+    //     delay = 20;
+    // } else if (delta > 50) {
+    //     speed = 10;
+    //     delay = 20;
+    // } else if (delta > 10) {
+    //     speed = 5;
+    //     delay = 10;
+    // }
 
     int8_t direction = 1;
     if (to_val < from_val) {
@@ -108,6 +116,17 @@ static void change_pen(int16_t pen_number) {
     cnc_delay_ms(1000);
 }
 
+static void tune_pen(int16_t pwm_value) {
+    DBGMSG("pen_revolver tune_pen(%d)", pwm_value);
+
+    // turn servo #1 via PCA9685 
+    uint16_t pos = pwm_value;
+    DBGMSG("pen_revolver tune_pen(), pos=%d", pos);
+    gradual_move(PEN_CHANGING_SERVO_NUM, current_pos_revolver, pos);
+    current_pos_revolver = pos;
+    cnc_delay_ms(1000);
+}
+
 static void toggle_pen() {
     DBGMSG("pen_revolver toggle_pen()");
     // turn servo #2 via PCA9685
@@ -130,6 +149,10 @@ static void set_speed(int16_t value)
     DBGMSG("pen_revolver set_speed(%d)", value);
     if (value == -5) {
         toggle_pen();
+    }
+
+    if (value < -50) {
+        tune_pen(value * -1);
     }
 
     if (value > 0) {
