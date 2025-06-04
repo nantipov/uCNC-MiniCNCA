@@ -22,7 +22,7 @@
 #endif
 
 #ifndef PEN_TOGGLE_SERVO_LOW_POS
-#define PEN_TOGGLE_SERVO_LOW_POS 87
+#define PEN_TOGGLE_SERVO_LOW_POS 79
 #endif
 
 uint16_t pen_changing_servo_positions[5] = {
@@ -42,6 +42,7 @@ uint16_t pen_changing_servo_positions[5] = {
 // }; // 0 .. 4096
 
 uint16_t current_pos_revolver = 50UL;
+bool is_pen_engaged = false;
 
 static void startup_code(void)
 {
@@ -127,26 +128,41 @@ static void tune_pen(int16_t pwm_value) {
     cnc_delay_ms(1000);
 }
 
+static void release_pen_state() {
+    DBGMSG("pen_revolver release_pen_state()");
+    is_pen_engaged = false;
+}
+
 static void toggle_pen() {
     DBGMSG("pen_revolver toggle_pen()");
+    if (is_pen_engaged) {
+        DBGMSG("pen was not released; duplicate call?");
+        return;
+    }
+    is_pen_engaged = true;
     // turn servo #2 via PCA9685
 
-    // set to up if it is not
+    // move to the top position if it is not
     pca9685_setPWM(PEN_TOGGLE_SERVO_NUM, 0, PEN_TOGGLE_SERVO_HIGH_POS);
-    cnc_delay_ms(2000);
+    cnc_delay_ms(500);
 
     // down
     gradual_move(PEN_TOGGLE_SERVO_NUM, PEN_TOGGLE_SERVO_HIGH_POS, PEN_TOGGLE_SERVO_LOW_POS);
-    cnc_delay_ms(2000);
+    cnc_delay_ms(500);
 
     // up
     gradual_move(PEN_TOGGLE_SERVO_NUM, PEN_TOGGLE_SERVO_LOW_POS, PEN_TOGGLE_SERVO_HIGH_POS);
-    cnc_delay_ms(2000);
+    cnc_delay_ms(500);
 }
 
 static void set_speed(int16_t value)
 {
     DBGMSG("pen_revolver set_speed(%d)", value);
+
+    if (value == -1) {
+        release_pen_state();
+    }
+
     if (value == -5) {
         toggle_pen();
     }
