@@ -22,23 +22,23 @@
 #endif
 
 #ifndef PEN_TOGGLE_SERVO_LOW_POS
-#define PEN_TOGGLE_SERVO_LOW_POS 79
+#define PEN_TOGGLE_SERVO_LOW_POS 95
 #endif
 
 uint16_t pen_changing_servo_positions[5] = {
-    72UL,
-    154UL,
-    242UL,
-    334UL,
-    424UL
+    78UL,
+    164UL,
+    252UL,
+    344UL,
+    434UL
 }; // 0 .. 4096
 
 // uint16_t pen_changing_servo_positions[5] = {
-//     108UL,
-//     190UL,
-//     278UL,
-//     370UL,
-//     460UL
+//     72UL,
+//     154UL,
+//     242UL,
+//     334UL,
+//     424UL
 // }; // 0 .. 4096
 
 uint16_t current_pos_revolver = 50UL;
